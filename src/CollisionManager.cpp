@@ -9,9 +9,10 @@ CollisionResult CollisionManager::check(Point nextPos, const Snake &snake, const
     }
 
     // 2.撞自己
-    for (const auto &p : snake.getBody())
+    const auto &body = snake.getBody();
+    for (size_t i = 1; i < body.size(); ++i)
     {
-        if (nextPos == p)
+        if (nextPos == body[i])
         {
             return CollisionResult::SELF;
         }

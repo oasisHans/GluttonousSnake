@@ -66,6 +66,7 @@ void GameManager::updatePlaying()
     case CollisionResult::NONE:
         snake->move(false);
         break;
+
     // 吃到食物增长
     case CollisionResult::FOOD:
     {
@@ -77,8 +78,22 @@ void GameManager::updatePlaying()
         map->GenerateObstacle(*snake, gamesettings.getObstacleLevel());
         break;
     }
-    // 死亡
+
+    // 穿墙
     case CollisionResult::WALL:
+    {
+        snake->throughWall();
+        Point afterWallHead = snake->getHeadPos();
+        CollisionResult secondCheck = CollisionManager::check(afterWallHead, *snake, *map);
+        if (secondCheck == CollisionResult::SELF || secondCheck == CollisionResult::OBSTACLE)
+        {
+            snake->die();
+            this->gamestate = GameState::GameOver;
+        }
+        break;
+    }
+
+    // 死亡
     case CollisionResult::SELF:
     case CollisionResult::OBSTACLE:
         snake->die();
@@ -131,6 +146,11 @@ void GameManager::run()
         {
             int choice = input.getNumberInput();
             if (choice == 1)
+            {
+                initGame();
+                gamestate = GameState::Playing;
+            }
+            else if (choice == 2)
             {
                 gamestate = GameState::Start;
             }

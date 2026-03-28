@@ -24,8 +24,10 @@ public:
 
     void setDirection(Direction newDir);
 
+    void throughWall();
     // 返回参数
     Point getHeadPos() const { return body.front(); }
+    Direction getDir() const { return dir; }
     // 返回整个蛇身
     const std::deque<Point> &getBody() const { return body; }
     // 检查是否存活

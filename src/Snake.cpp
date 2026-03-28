@@ -31,6 +31,28 @@ Point Snake::getNextHead() const
     return NextHead;
 }
 
+void Snake::throughWall()
+{
+    Point newHead = this->getHeadPos();
+    switch (this->dir)
+    {
+    case Direction::UP:
+        newHead.y = GRID_H - 1;
+        break;
+    case Direction::DOWN:
+        newHead.y = 0;
+        break;
+    case Direction::LEFT:
+        newHead.x = GRID_W - 1;
+        break;
+    case Direction::RIGHT:
+        newHead.x = 0;
+        break;
+    }
+    this->body.push_front(newHead);
+    this->body.pop_back();
+}
+
 void Snake::move(bool Grow)
 {
     Point newHead = this->getNextHead();

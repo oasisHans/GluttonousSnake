@@ -17,8 +17,8 @@ constexpr int GRID_H = (HEIGHT / GRID_SIZE);
 
 // 帧率设置（速度设置）
 constexpr int DELAY_SLOW = 220;
-constexpr int DELAY_NORMAL = 140;
-constexpr int DELAY_FAST = 60;
+constexpr int DELAY_NORMAL = 105;
+constexpr int DELAY_FAST = 40;
 
 constexpr int DIS_MIN = 3;
 

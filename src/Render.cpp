@@ -95,17 +95,18 @@ void Render::drawGameOverUI(int score)
 {
     settextcolor(RED);
     settextstyle(80, 0, _T("Consolas"));
-    outtextxy(WIDTH / 6, HEIGHT / 2.5, _T("GAME OVER!!!"));
+    outtextxy(WIDTH / 6, HEIGHT / 4, _T("GAME OVER!!!"));
 
     settextcolor(WHITE);
     settextstyle(40, 0, _T("Consolas"));
     TCHAR scoreStr[32];
     _stprintf_s(scoreStr, _T("Final Score: %d"), score);
-    outtextxy(WIDTH / 4, HEIGHT / 3 + 150, scoreStr);
+    outtextxy(WIDTH / 4, HEIGHT / 3 + 40, scoreStr);
 
     settextcolor(YELLOW);
     settextstyle(25, 0, _T("Consolas"));
 
-    outtextxy(WIDTH / 4, HEIGHT / 3 + 220, _T("Press 1 to Play Again"));
-    outtextxy(WIDTH / 4, HEIGHT / 3 + 260, _T("Press 0 to Exit Game"));
+    outtextxy(WIDTH / 4, HEIGHT / 3 + 120, _T("Press 1 to Play Again"));
+    outtextxy(WIDTH / 4, HEIGHT / 3 + 160, _T("Press 2 to StartMenu"));
+    outtextxy(WIDTH / 4, HEIGHT / 3 + 200, _T("Press 0 to Exit Game"));
 }

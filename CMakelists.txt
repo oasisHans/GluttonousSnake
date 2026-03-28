@@ -13,6 +13,13 @@ set(ALL_SOURCES ${SRC_FILES} main.cpp)
 
 add_executable(GluttonousSnake ${ALL_SOURCES})
 
+# 静态链接标准库，这样就不需要 libgcc_s_seh-1.dll 等文件了
+target_link_libraries(GluttonousSnake
+    -static
+    -static-libgcc
+    -static-libstdc++
+)
+
 target_link_libraries(GluttonousSnake
     easyx
     gdi32
