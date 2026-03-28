@@ -56,44 +56,56 @@ void GameManager::updatePlaying()
 
     snake->HandleInput(input);
 
-    Point nextHead = snake->getNextHead();
+    Point finalPos = snake->getNextHead();
+    bool resolved = false;
 
-    CollisionResult collide_result = CollisionManager::check(nextHead, *snake, *map);
-
-    switch (collide_result)
+    while (!resolved)
     {
-    // 正常移动
+        CollisionResult res = CollisionManager::check(finalPos, *snake, *map);
+
+        switch (res)
+        {
+        case CollisionResult::WALL:
+            finalPos = snake->getWrappedPos(finalPos);
+            break;
+        case CollisionResult::PORTAL:
+        {
+            Portal *p = static_cast<Portal *>(map->getItemAt(finalPos));
+            finalPos = p->getDestination();
+            map->removeTypeAll(ItemType::PORTAL);
+            break;
+        }
+        default:
+            resolved = true;
+        }
+    }
+
+    CollisionResult finalRes = CollisionManager::check(finalPos, *snake, *map);
+
+    switch (finalRes)
+    {
     case CollisionResult::NONE:
-        snake->move(false);
+        snake->moveDirect(finalPos, false);
         break;
 
-    // 吃到食物增长
     case CollisionResult::FOOD:
-    {
-        snake->move(true);
+        snake->moveDirect(finalPos, true);
         this->score++;
+
+        // 清空旧地图
         map->removeTypeAll(ItemType::FOOD);
         map->removeTypeAll(ItemType::OBSTACLE);
+        map->removeTypeAll(ItemType::PORTAL);
+
+        // 生成下一轮地图
         map->GenerateFood(*snake);
         map->GenerateObstacle(*snake, gamesettings.getObstacleLevel());
-        break;
-    }
-
-    // 穿墙
-    case CollisionResult::WALL:
-    {
-        snake->throughWall();
-        Point afterWallHead = snake->getHeadPos();
-        CollisionResult secondCheck = CollisionManager::check(afterWallHead, *snake, *map);
-        if (secondCheck == CollisionResult::SELF || secondCheck == CollisionResult::OBSTACLE)
+        if (this->rng.chance(PortalChance))
         {
-            snake->die();
-            this->gamestate = GameState::GameOver;
+            map->GeneratePortalPair(*snake);
         }
         break;
-    }
 
-    // 死亡
     case CollisionResult::SELF:
     case CollisionResult::OBSTACLE:
         snake->die();
@@ -101,6 +113,7 @@ void GameManager::updatePlaying()
         FlushBatchDraw();
         Sleep(1000);
         this->gamestate = GameState::GameOver;
+        break;
     }
 }
 

@@ -16,11 +16,14 @@ constexpr int GRID_W = (WIDTH / GRID_SIZE);
 constexpr int GRID_H = (HEIGHT / GRID_SIZE);
 
 // 帧率设置（速度设置）
-constexpr int DELAY_SLOW = 220;
-constexpr int DELAY_NORMAL = 105;
+constexpr int DELAY_SLOW = 180;
+constexpr int DELAY_NORMAL = 90;
 constexpr int DELAY_FAST = 40;
 
 constexpr int DIS_MIN = 3;
+
+// 传送门生成概率（%）
+constexpr int PortalChance = 50;
 
 // Snake方向枚举
 enum class Direction
@@ -97,9 +100,20 @@ private:
 
 public:
     RandomGenerator() : gen(std::random_device{}()) {}
+    // 随机数生成
     int generate(int min, int max)
     {
         std::uniform_int_distribution<> distrib(min, max);
         return distrib(gen);
+    }
+
+    bool chance(int odds)
+    {
+        int num = generate(0, 99);
+        if (num < odds)
+        {
+            return true;
+        }
+        return false;
     }
 };

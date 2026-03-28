@@ -4,6 +4,7 @@
 #include "Snake.h"
 #include "PlayerSnake.h"
 #include "Food.h"
+#include "Portal.h"
 #include "Obstacle.h"
 #include "GameSettings.h"
 #include <vector>
@@ -21,6 +22,7 @@ public:
 
     void GenerateFood(const Snake &snake);
     void GenerateObstacle(const Snake &snake, const ObstacleLevel &num_obs);
+    void GeneratePortalPair(const Snake &snake);
 
     void drawAll() const;
 

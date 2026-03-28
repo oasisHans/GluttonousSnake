@@ -88,7 +88,6 @@ void Render::drawPauseUI()
 {
     settextcolor(WHITE);
     settextstyle(25, 0, _T("Consolas"));
-    outtextxy(WIDTH / 4, HEIGHT / 2 - 40, _T("Press 1 to Setting"));
     outtextxy(WIDTH / 4, HEIGHT / 2, _T("Press SPACE to continue"));
 }
 void Render::drawGameOverUI(int score)

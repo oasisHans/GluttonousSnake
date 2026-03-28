@@ -53,25 +53,48 @@ void Snake::throughWall()
     this->body.pop_back();
 }
 
-void Snake::move(bool Grow)
+void Snake::moveDirect(Point destination, bool Grow)
 {
-    Point newHead = this->getNextHead();
-    this->body.push_front(newHead);
-
-    // 若普通移动则删除尾部
+    this->body.push_front(destination);
     if (!Grow)
     {
         this->body.pop_back();
     }
 }
 
+Point Snake::getWrappedPos(Point p) const
+{
+    if (p.x < 0)
+        p.x = GRID_W - 1;
+    else if (p.x >= GRID_W)
+        p.x = 0;
+
+    if (p.y < 0)
+        p.y = GRID_H - 1;
+    else if (p.y >= GRID_H)
+        p.y = 0;
+
+    return p;
+}
+
 void Snake::draw() const
 {
+    setfillcolor(WHITE);
+    for (const auto &p : body)
+    {
+        solidrectangle(p.x * GRID_SIZE - 1,
+                       p.y * GRID_SIZE - 1,
+                       (p.x + 1) * GRID_SIZE + 1,
+                       (p.y + 1) * GRID_SIZE + 1);
+    }
+
     setfillcolor(this->color);
     for (const auto &p : body)
     {
-        fillrectangle(p.x * GRID_SIZE, p.y * GRID_SIZE,
-                      (p.x + 1) * GRID_SIZE, (p.y + 1) * GRID_SIZE);
+        solidrectangle(p.x * GRID_SIZE,
+                       p.y * GRID_SIZE,
+                       (p.x + 1) * GRID_SIZE,
+                       (p.y + 1) * GRID_SIZE);
     }
 }
 
@@ -90,5 +113,14 @@ void Snake::setDirection(Direction newDir)
 void Snake::die()
 {
     isAlive = false;
+
+    setfillcolor(WHITE);
+    for (const auto &p : body)
+    {
+        solidrectangle(p.x * GRID_SIZE - 1,
+                       p.y * GRID_SIZE - 1,
+                       (p.x + 1) * GRID_SIZE + 1,
+                       (p.y + 1) * GRID_SIZE + 1);
+    }
     this->color = LIGHTGRAY;
 }

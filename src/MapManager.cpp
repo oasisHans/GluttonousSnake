@@ -1,5 +1,4 @@
 #include "MapManager.h"
-#include "Food.h"
 
 MapManager::MapManager() {}
 
@@ -59,13 +58,13 @@ void MapManager::GenerateObstacle(const Snake &snake, const ObstacleLevel &obsLe
     switch (obsLevel)
     {
     case ObstacleLevel::LOW:
-        num = rng.generate(3, 5);
+        num = rng.generate(5, 8);
         break;
     case ObstacleLevel::NORMAL:
-        num = rng.generate(9, 12);
+        num = rng.generate(14, 18);
         break;
     case ObstacleLevel::HIGH:
-        num = rng.generate(20, 26);
+        num = rng.generate(25, 30);
         break;
     }
     Point snakeHead = snake.getHeadPos();
@@ -111,6 +110,72 @@ void MapManager::GenerateObstacle(const Snake &snake, const ObstacleLevel &obsLe
         }
         warehouses[ItemType::OBSTACLE].push_back(new Obstacle(p));
     }
+}
+
+void MapManager::GeneratePortalPair(const Snake &snake)
+{
+    std::vector<Point> portalSite;
+    Point snakeHead = snake.getHeadPos();
+    for (int i = 0; i < 2; i++)
+    {
+        Point p;
+        while (true)
+        {
+
+            bool overlap = false;
+            p.x = rng.generate(0, GRID_W - 1);
+            p.y = rng.generate(0, GRID_H - 1);
+
+            // 判断是否和蛇身重叠
+            for (const auto &bodyPart : snake.getBody())
+            {
+                if (p == bodyPart)
+                {
+                    overlap = true;
+                    break;
+                }
+            }
+            if (abs(p.x - snakeHead.x) < DIS_MIN && abs(p.y - snakeHead.y) < DIS_MIN)
+            {
+                overlap = true;
+            }
+            for (const auto &pair : warehouses)
+            {
+                for (Item *item : pair.second)
+                {
+                    if (p == item->getPos())
+                    {
+                        overlap = true;
+                        break;
+                    }
+                    if (overlap)
+                        break;
+                }
+            }
+            if (!portalSite.empty())
+            {
+                const auto it = portalSite.begin();
+                if ((abs(p.x - (*it).x) < 6) && (abs(p.y - (*it).y) < 6))
+                {
+                    overlap = true;
+                }
+            }
+            if (!overlap)
+            {
+                break;
+            }
+        }
+        portalSite.push_back(p);
+    }
+    Point p1 = portalSite[0];
+    Point p2 = portalSite[1];
+
+    Portal *portalA = new Portal(p1, p2);
+    Portal *portalB = new Portal(p2, p1);
+
+    warehouses[ItemType::PORTAL].push_back(portalA);
+    warehouses[ItemType::PORTAL].push_back(portalB);
+    portalSite.clear();
 }
 
 void MapManager::drawAll() const

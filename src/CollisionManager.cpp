@@ -28,6 +28,8 @@ CollisionResult CollisionManager::check(Point nextPos, const Snake &snake, const
             return CollisionResult::FOOD;
         case ItemType::OBSTACLE:
             return CollisionResult::OBSTACLE;
+        case ItemType::PORTAL:
+            return CollisionResult::PORTAL;
         }
     }
 

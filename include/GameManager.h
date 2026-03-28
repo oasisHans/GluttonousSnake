@@ -21,6 +21,7 @@ private:
     GameSettings gamesettings;
 
     int score;
+    RandomGenerator rng;
 
 public:
     GameManager();

@@ -18,16 +18,17 @@ public:
 
     Point getNextHead() const;
 
-    virtual void move(bool Grow);
-
     virtual void draw() const;
 
     void setDirection(Direction newDir);
 
     void throughWall();
+
+    void moveDirect(Point destination, bool Grow);
     // 返回参数
     Point getHeadPos() const { return body.front(); }
     Direction getDir() const { return dir; }
+    Point getWrappedPos(Point p) const;
     // 返回整个蛇身
     const std::deque<Point> &getBody() const { return body; }
     // 检查是否存活
