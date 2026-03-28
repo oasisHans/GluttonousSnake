@@ -1,0 +1,19 @@
+# 过滤掉所有的构建文件夹
+build/
+bin/
+obj/
+
+# 过滤掉所有的可执行文件
+*.exe
+*.out
+
+# 过滤掉 IDE 的本地配置
+.vscode/
+.vs/
+*.sln
+*.vcxproj
+*.user
+
+# 过滤掉临时文件
+*.log
+*.tmp
