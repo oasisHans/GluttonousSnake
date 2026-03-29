@@ -1,6 +1,6 @@
 #include "Render.h"
 
-void Render::render(GameState gamestate, const Snake *snake, const MapManager *map, int score, const GameSettings &settings)
+void Render::render(GameState gamestate, const Snake *snake, const MapManager *map, int score, const GameSettings &settings, const RecordManager &record)
 {
     BeginBatchDraw();
     cleardevice();
@@ -13,6 +13,9 @@ void Render::render(GameState gamestate, const Snake *snake, const MapManager *m
     case GameState::Set:
         this->drawSetUI(settings);
         break;
+    case GameState::History:
+        this->drawHistoryUI(record);
+        break;
     case GameState::Playing:
         this->drawPlayingUI(snake, map, score);
         break;
@@ -20,7 +23,7 @@ void Render::render(GameState gamestate, const Snake *snake, const MapManager *m
         this->drawPauseUI();
         break;
     case GameState::GameOver:
-        this->drawGameOverUI(score);
+        this->drawGameOverUI(score, record);
         break;
     }
     EndBatchDraw();
@@ -35,6 +38,10 @@ void Render::drawStartUI()
     settextcolor(WHITE);
     settextstyle(25, 0, _T("Consolas"));
     outtextxy(WIDTH / 4, HEIGHT / 2 + 40, _T("Press SPACE to Start"));
+
+    settextcolor(WHITE);
+    settextstyle(25, 0, _T("Consolas"));
+    outtextxy(WIDTH / 4, HEIGHT / 2 + 80, _T("Press H to check HISTORY GOAT"));
 }
 
 void Render::drawSetUI(const GameSettings &settings)
@@ -71,6 +78,11 @@ void Render::drawSetUI(const GameSettings &settings)
     }
 }
 
+void Render::drawHistoryUI(const RecordManager &record)
+{
+    record.draw();
+}
+
 void Render::drawPlayingUI(const Snake *snake, const MapManager *map, int score)
 {
     map->drawAll();
@@ -90,7 +102,7 @@ void Render::drawPauseUI()
     settextstyle(25, 0, _T("Consolas"));
     outtextxy(WIDTH / 4, HEIGHT / 2, _T("Press SPACE to continue"));
 }
-void Render::drawGameOverUI(int score)
+void Render::drawGameOverUI(int score, const RecordManager &record)
 {
     settextcolor(RED);
     settextstyle(80, 0, _T("Consolas"));
@@ -101,6 +113,13 @@ void Render::drawGameOverUI(int score)
     TCHAR scoreStr[32];
     _stprintf_s(scoreStr, _T("Final Score: %d"), score);
     outtextxy(WIDTH / 4, HEIGHT / 3 + 40, scoreStr);
+
+    if (score > record.last_Goat)
+    {
+        settextcolor(YELLOW);
+        settextstyle(30, 0, _T("Consolas"));
+        outtextxy(WIDTH / 4, HEIGHT / 3 + 80, _T("New Goat!"));
+    }
 
     settextcolor(YELLOW);
     settextstyle(25, 0, _T("Consolas"));

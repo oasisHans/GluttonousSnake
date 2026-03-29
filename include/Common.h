@@ -5,6 +5,8 @@
 #include <deque>
 #include <random>
 #include <math.h>
+#include <fstream>
+#include <algorithm>
 
 // 游戏窗口尺寸
 constexpr int WIDTH = 640;
@@ -48,6 +50,7 @@ enum class GameState
 {
     Start,
     Set,
+    History,
     Playing,
     Paused,
     GameOver

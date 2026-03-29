@@ -4,7 +4,10 @@ GameManager::GameManager()
     : snake(nullptr),
       map(nullptr),
       score(0),
-      gamestate(GameState::Start) {}
+      gamestate(GameState::Start)
+{
+    this->record.loadRecord();
+}
 
 GameManager::~GameManager()
 {
@@ -109,7 +112,7 @@ void GameManager::updatePlaying()
     case CollisionResult::SELF:
     case CollisionResult::OBSTACLE:
         snake->die();
-        renderer.render(gamestate, snake, map, score, gamesettings);
+        renderer.render(gamestate, snake, map, score, gamesettings, record);
         FlushBatchDraw();
         Sleep(1000);
         this->gamestate = GameState::GameOver;
@@ -131,6 +134,21 @@ void GameManager::run()
             {
                 gamestate = GameState::Set;
                 gamesettings.reset();
+            }
+            else if (input.isKeyPressed(0x48))
+            {
+                gamestate = GameState::History;
+            }
+            break;
+        case GameState::History:
+            if (input.isKeyPressed(VK_SPACE))
+            {
+                gamestate = GameState::Set;
+                gamesettings.reset();
+            }
+            else if (input.isKeyPressed(0x30) || input.isKeyPressed(0x60))
+            {
+                gamestate = GameState::Start;
             }
             break;
         case GameState::Set:
@@ -157,25 +175,31 @@ void GameManager::run()
             break;
         case GameState::GameOver:
         {
+
             int choice = input.getNumberInput();
             if (choice == 1)
             {
                 initGame();
+                record.saveRecord(gamesettings, this->score);
+                record.loadRecord();
                 gamestate = GameState::Playing;
             }
             else if (choice == 2)
             {
+                record.saveRecord(gamesettings, this->score);
+                record.loadRecord();
                 gamestate = GameState::Start;
             }
             else if (choice == 0)
             {
+                record.saveRecord(gamesettings, this->score);
                 return;
             }
             break;
         }
         }
 
-        renderer.render(gamestate, snake, map, score, gamesettings);
+        renderer.render(gamestate, snake, map, score, gamesettings, record);
 
         if (gamestate == GameState::Playing)
         {

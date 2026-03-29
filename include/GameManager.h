@@ -9,6 +9,7 @@
 #include "InputHandler.h"
 #include "Render.h"
 #include "GameSettings.h"
+#include "RecordManager.h"
 
 class GameManager
 {
@@ -19,6 +20,7 @@ private:
     GameState gamestate;
     Render renderer;
     GameSettings gamesettings;
+    RecordManager record;
 
     int score;
     RandomGenerator rng;

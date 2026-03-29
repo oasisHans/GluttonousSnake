@@ -18,4 +18,5 @@ public:
     int PlayDelay() const;
     SetType getSetStep() const { return setStep; }
     ObstacleLevel getObstacleLevel() const { return obsLevel; }
+    Speed getSpeedLevel() const { return speedLevel; }
 };
