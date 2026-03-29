@@ -25,10 +25,10 @@ constexpr int DELAY_FAST = 40;
 constexpr int DIS_MIN = 3;
 
 // 传送门生成概率（%）
-constexpr int PortalChance = 100;
+constexpr int PortalChance = 50;
 
 // 减半药水生成概率（%）
-constexpr int HalveChance = 50;
+constexpr int HalveChance = 30;
 
 // Snake方向枚举
 enum class Direction
