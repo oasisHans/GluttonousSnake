@@ -8,6 +8,7 @@ Snake::Snake(Point startPos, Direction startDir, COLORREF col)
     body.push_front(startPos);
     body.push_back(Point(startPos.x - 1, startPos.y));
     body.push_back(Point(startPos.x - 2, startPos.y));
+    this->Length = 3;
 }
 
 Point Snake::getNextHead() const
@@ -53,12 +54,28 @@ void Snake::throughWall()
     this->body.pop_back();
 }
 
-void Snake::moveDirect(Point destination, bool Grow)
+void Snake::moveDirect(Point destination, bool Grow, bool Halve)
 {
     this->body.push_front(destination);
     if (!Grow)
     {
         this->body.pop_back();
+    }
+    if (Halve)
+    {
+        if (Length >= 6)
+        {
+            int count = Length / 2;
+            for (int i = 0; i < count; i++)
+            {
+                this->body.pop_back();
+            }
+            this->Length -= count;
+        }
+    }
+    if (Grow)
+    {
+        this->Length++;
     }
 }
 

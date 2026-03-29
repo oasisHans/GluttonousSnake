@@ -88,18 +88,18 @@ void GameManager::updatePlaying()
     switch (finalRes)
     {
     case CollisionResult::NONE:
-        snake->moveDirect(finalPos, false);
+        snake->moveDirect(finalPos, false, false);
         break;
 
     case CollisionResult::FOOD:
-        snake->moveDirect(finalPos, true);
+        snake->moveDirect(finalPos, true, false);
         this->score++;
 
         // 清空旧地图
         map->removeTypeAll(ItemType::FOOD);
         map->removeTypeAll(ItemType::OBSTACLE);
         map->removeTypeAll(ItemType::PORTAL);
-
+        map->removeTypeAll(ItemType::HALVEPOTION);
         // 生成下一轮地图
         map->GenerateFood(*snake);
         map->GenerateObstacle(*snake, gamesettings.getObstacleLevel());
@@ -107,6 +107,15 @@ void GameManager::updatePlaying()
         {
             map->GeneratePortalPair(*snake);
         }
+        if (this->rng.chance(HalveChance))
+        {
+            map->GenerateHalvePotion(*snake);
+        }
+        break;
+
+    case CollisionResult::HALVEPOTION:
+        snake->moveDirect(finalPos, false, true);
+        map->removeTypeAll(ItemType::HALVEPOTION);
         break;
 
     case CollisionResult::SELF:
@@ -179,8 +188,8 @@ void GameManager::run()
             int choice = input.getNumberInput();
             if (choice == 1)
             {
-                initGame();
                 record.saveRecord(gamesettings, this->score);
+                initGame();
                 record.loadRecord();
                 gamestate = GameState::Playing;
             }

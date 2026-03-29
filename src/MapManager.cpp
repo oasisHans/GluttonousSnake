@@ -178,6 +178,52 @@ void MapManager::GeneratePortalPair(const Snake &snake)
     portalSite.clear();
 }
 
+void MapManager::GenerateHalvePotion(const Snake &snake)
+{
+    Point snakeHead = snake.getHeadPos();
+    Point p;
+    while (true)
+    {
+        bool overlap = false;
+        p.x = rng.generate(0, GRID_W - 1);
+        p.y = rng.generate(0, GRID_H - 1);
+
+        // 判断是否和蛇身重叠
+        for (const auto &bodyPart : snake.getBody())
+        {
+            if (p == bodyPart)
+            {
+                overlap = true;
+                break;
+            }
+        }
+
+        if (abs(p.x - snakeHead.x) < DIS_MIN && abs(p.y - snakeHead.y) < DIS_MIN)
+        {
+            overlap = true;
+        }
+
+        for (const auto &pair : warehouses)
+        {
+            for (Item *item : pair.second)
+            {
+                if (p == item->getPos())
+                {
+                    overlap = true;
+                    break;
+                }
+                if (overlap)
+                    break;
+            }
+        }
+        if (!overlap)
+        {
+            break;
+        }
+    }
+    warehouses[ItemType::HALVEPOTION].push_back(new HalvePotion(p));
+}
+
 void MapManager::drawAll() const
 {
     for (const auto &pair : warehouses)

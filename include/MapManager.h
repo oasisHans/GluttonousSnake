@@ -6,6 +6,7 @@
 #include "Food.h"
 #include "Portal.h"
 #include "Obstacle.h"
+#include "HalvePotion.h"
 #include "GameSettings.h"
 #include <vector>
 #include <map>
@@ -23,6 +24,7 @@ public:
     void GenerateFood(const Snake &snake);
     void GenerateObstacle(const Snake &snake, const ObstacleLevel &num_obs);
     void GeneratePortalPair(const Snake &snake);
+    void GenerateHalvePotion(const Snake &snake);
 
     void drawAll() const;
 

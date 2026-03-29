@@ -9,6 +9,7 @@ protected:
     COLORREF color;
     Direction dir;
     bool isAlive;
+    int Length;
 
 public:
     // 构造函数
@@ -24,7 +25,8 @@ public:
 
     void throughWall();
 
-    void moveDirect(Point destination, bool Grow);
+    void moveDirect(Point destination, bool Grow, bool Halve);
+
     // 返回参数
     Point getHeadPos() const { return body.front(); }
     Direction getDir() const { return dir; }

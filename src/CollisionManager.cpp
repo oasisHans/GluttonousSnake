@@ -30,6 +30,8 @@ CollisionResult CollisionManager::check(Point nextPos, const Snake &snake, const
             return CollisionResult::OBSTACLE;
         case ItemType::PORTAL:
             return CollisionResult::PORTAL;
+        case ItemType::HALVEPOTION:
+            return CollisionResult::HALVEPOTION;
         }
     }
 

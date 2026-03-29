@@ -10,7 +10,8 @@ enum class CollisionResult
     SELF,
     FOOD,
     OBSTACLE,
-    PORTAL
+    PORTAL,
+    HALVEPOTION
     // 后面可以继续添加
 };
 

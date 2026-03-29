@@ -18,58 +18,74 @@ public:
     // 实现绘图函数
     virtual void draw() override
     {
-        timer += 0.2; // 动画驱动
+        timer += -0.30;
 
         int cx = pos.x * GRID_SIZE + GRID_SIZE / 2;
         int cy = pos.y * GRID_SIZE + GRID_SIZE / 2;
 
-        // --- 第一层：深空背景光晕 ---
-        for (int i = 5; i > 0; i--)
+        setfillcolor(RGB(15, 0, 30));
+        solidcircle(cx, cy, GRID_SIZE * 0.8);
+
+        for (int arm = 0; arm < 2; arm++)
         {
-            // 逐渐变淡的紫色光圈
-            setfillcolor(RGB(20 * i, 0, 30 * i));
-            solidcircle(cx, cy, (GRID_SIZE / 2) + i);
+            double armOffset = arm * 3.14159;
+
+            for (int i = 0; i < 80; i++)
+            {
+                double r = (i / 80.0) * (GRID_SIZE * 0.95);
+
+                double spiralShape = r * 0.5;
+                double rotation = timer;
+
+                double wave = 0.1 * sin(r * 0.8 - timer * 3);
+                double angle = rotation + spiralShape + armOffset + wave;
+
+                int px = cx + (int)(cos(angle) * r);
+                int py = cy + (int)(sin(angle) * r);
+
+                if (i < 15)
+                {
+                    setfillcolor(WHITE);
+                    solidrectangle(px, py, px + 2, py + 2);
+                }
+                else
+                {
+                    int purple = 255 - i * 2;
+                    int blue = i * 3;
+                    setfillcolor(RGB(purple > 0 ? purple : 0, 50, blue < 255 ? blue : 255));
+                    solidrectangle(px, py, px + 1, py + 1);
+                }
+            }
         }
 
-        // --- 第二层：吸积盘漩涡粒子 (25个粒子) ---
-        for (int i = 0; i < 25; i++)
+        for (int k = 0; k < 12; k++)
         {
-            // 每个粒子有自己的基础轨道
-            double orbitRadius = (i % 3 + 1) * (GRID_SIZE / 8.0) + 2;
 
-            // 内圈(i小)转得快，外圈(i大)转得慢
-            double speed = 5.0 - (i * 0.15);
-            double angle = timer * speed + (i * 6.28 / 20.0);
+            double r = GRID_SIZE * (0.8 + (rand() % 30) / 100.0);
 
-            // 计算粒子位置
-            int px = cx + (int)(cos(angle) * orbitRadius);
-            int py = cy + (int)(sin(angle) * orbitRadius);
+            double fastAngle = timer * 2.5 + (k * 6.28 / 12.0) + (rand() % 10 / 10.0);
 
-            // 粒子颜色：紫色、青色、白色交替，营造星尘感
-            if (i % 3 == 0)
-                setfillcolor(RGB(255, 0, 255)); // 霓虹紫
-            else if (i % 3 == 1)
-                setfillcolor(RGB(0, 255, 255)); // 极光青
-            else
-                setfillcolor(WHITE); // 核心白
+            int fx = cx + (int)(cos(fastAngle) * r);
+            int fy = cy + (int)(sin(fastAngle) * r);
 
-            // 粒子大小随呼吸起伏
-            int pSize = (i % 2 == 0) ? 2 : 1;
-            solidcircle(px, py, pSize);
+            if (rand() % 5 > 1)
+            {
+                setfillcolor(WHITE);
+                solidrectangle(fx, fy, fx + 1, fy + 1);
+            }
         }
 
-        // --- 第三层：事件视界 (Event Horizon) ---
-        // 带有暗红边缘的纯黑核心
-        setfillcolor(RGB(60, 0, 0));
-        solidcircle(cx, cy, GRID_SIZE / 4 + 1);
+        setfillcolor(WHITE);
+        solidcircle(cx, cy, GRID_SIZE / 12 + 1);
         setfillcolor(BLACK);
-        solidcircle(cx, cy, GRID_SIZE / 4);
+        solidcircle(cx, cy, GRID_SIZE / 12);
 
-        // --- 第四层：核心闪烁亮点 ---
-        if ((int)(timer * 10) % 5 == 0)
+        setfillcolor(RGB(200, 200, 255));
+        for (int j = 0; j < 3; j++)
         {
-            setfillcolor(WHITE);
-            solidcircle(cx, cy, 1);
+            int lx = cx - 5 + rand() % 10;
+            int ly = cy + (int)(2 * cos(timer * 15 + j));
+            solidrectangle(lx, ly, lx + 1, ly + 1);
         }
     }
 
