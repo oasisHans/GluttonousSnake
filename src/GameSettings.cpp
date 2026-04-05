@@ -12,6 +12,7 @@ void GameSettings::reset()
     speedLevel = Speed::NORMAL;
     setStep = SetType::Speed;
     obsLevel = ObstacleLevel::NORMAL;
+    iqLevel = IQLevel::NORMAL;
 }
 
 void GameSettings::setGame(int choice)
@@ -37,28 +38,60 @@ void GameSettings::setGame(int choice)
             break;
         }
         break;
-    // 后续添加其他菜单
     case SetType::Obastacle:
         switch (choice)
         {
         case 1:
             obsLevel = ObstacleLevel::LOW;
-            setStep = SetType::Final;
+            setStep = SetType::IQ;
             break;
         case 2:
             obsLevel = ObstacleLevel::NORMAL;
-            setStep = SetType::Final;
+            setStep = SetType::IQ;
             break;
         case 3:
             obsLevel = ObstacleLevel::HIGH;
+            setStep = SetType::IQ;
+            break;
+
+        default:
+            break;
+        }
+        break;
+    case SetType::IQ:
+        switch (choice)
+        {
+        case 1:
+            iqLevel = IQLevel::LOW;
             setStep = SetType::Final;
             break;
-        default:
+        case 2:
+            iqLevel = IQLevel::NORMAL;
+            setStep = SetType::Final;
+            break;
+        case 3:
+            iqLevel = IQLevel::HIGH;
+            setStep = SetType::Final;
             break;
         }
         break;
     default:
         break;
+    }
+}
+
+int GameSettings::getIQValue() const
+{
+    switch (iqLevel)
+    {
+    case IQLevel::LOW:
+        return 30;
+    case IQLevel::NORMAL:
+        return 60;
+    case IQLevel::HIGH:
+        return 85;
+    default:
+        return 60;
     }
 }
 

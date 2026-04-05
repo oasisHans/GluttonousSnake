@@ -17,9 +17,7 @@ public:
     // 析构函数
     virtual ~Snake() {}
 
-    Point getNextHead() const;
-
-    virtual void draw() const;
+        virtual void draw() const;
 
     void setDirection(Direction newDir);
 
@@ -28,6 +26,7 @@ public:
     void moveDirect(Point destination, bool Grow, bool Halve);
 
     // 返回参数
+    Point getNextHead() const;
     Point getHeadPos() const { return body.front(); }
     Direction getDir() const { return dir; }
     Point getWrappedPos(Point p) const;

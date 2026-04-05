@@ -20,10 +20,9 @@ MapManager::~MapManager()
     clearAll();
 }
 
-void MapManager::GenerateFood(const Snake &snake)
+void MapManager::GenerateFood(const std::vector<Snake *> &allSnakes)
 {
     Point p;
-    Point snakeHead = snake.getHeadPos();
 
     while (true)
     {
@@ -31,18 +30,26 @@ void MapManager::GenerateFood(const Snake &snake)
         p.x = rng.generate(0, GRID_W - 1);
         p.y = rng.generate(0, GRID_H - 1);
 
-        // 判断是否和蛇身重叠
-        for (const auto &bodyPart : snake.getBody())
+        for (const auto *s : allSnakes)
         {
-            if (p == bodyPart)
+            for (const auto &sBody : s->getBody())
+            {
+                if (p == sBody)
+                {
+                    overlap = true;
+                    break;
+                }
+            }
+            if (overlap)
+                break;
+        }
+
+        for (const auto *s : allSnakes)
+        {
+            if (abs(p.x - s->getHeadPos().x) < DIS_MIN && abs(p.y - s->getHeadPos().y) < DIS_MIN)
             {
                 overlap = true;
-                break;
             }
-        }
-        if (abs(p.x - snakeHead.x) < DIS_MIN && abs(p.y - snakeHead.y) < DIS_MIN)
-        {
-            overlap = true;
         }
         if (!overlap)
         {
@@ -52,44 +59,55 @@ void MapManager::GenerateFood(const Snake &snake)
     warehouses[ItemType::FOOD].push_back(new Food(p));
 }
 
-void MapManager::GenerateObstacle(const Snake &snake, const ObstacleLevel &obsLevel)
+void MapManager::GenerateObstacle(const std::vector<Snake *> &allSnakes, const ObstacleLevel &obsLevel)
 {
     int num = 0;
     switch (obsLevel)
     {
     case ObstacleLevel::LOW:
-        num = rng.generate(5, 8);
+        num = rng.generate(4, 6);
         break;
     case ObstacleLevel::NORMAL:
-        num = rng.generate(14, 18);
+        num = rng.generate(10, 12);
         break;
     case ObstacleLevel::HIGH:
-        num = rng.generate(25, 30);
+        num = rng.generate(20, 25);
         break;
     }
-    Point snakeHead = snake.getHeadPos();
     for (int i = 0; i < num; i++)
     {
         Point p;
-        while (true)
+        int attempts = 0;
+        while (attempts < 100)
         {
+            attempts++;
             bool overlap = false;
             p.x = rng.generate(0, GRID_W - 1);
             p.y = rng.generate(0, GRID_H - 1);
 
             // 判断是否和蛇身重叠
-            for (const auto &bodyPart : snake.getBody())
+            for (const auto *s : allSnakes)
             {
-                if (p == bodyPart)
+                for (const auto &sBody : s->getBody())
+                {
+                    if (p == sBody)
+                    {
+                        overlap = true;
+                        break;
+                    }
+                }
+                if (overlap)
+                    break;
+            }
+
+            for (const auto *s : allSnakes)
+            {
+                if (abs(p.x - s->getHeadPos().x) < DIS_MIN && abs(p.y - s->getHeadPos().y) < DIS_MIN)
                 {
                     overlap = true;
-                    break;
                 }
             }
-            if (abs(p.x - snakeHead.x) < DIS_MIN && abs(p.y - snakeHead.y) < DIS_MIN)
-            {
-                overlap = true;
-            }
+
             for (const auto &pair : warehouses)
             {
                 for (Item *item : pair.second)
@@ -108,14 +126,16 @@ void MapManager::GenerateObstacle(const Snake &snake, const ObstacleLevel &obsLe
                 break;
             }
         }
-        warehouses[ItemType::OBSTACLE].push_back(new Obstacle(p));
+        if (attempts < 100)
+        {
+            warehouses[ItemType::OBSTACLE].push_back(new Obstacle(p));
+        }
     }
 }
 
-void MapManager::GeneratePortalPair(const Snake &snake)
+void MapManager::GeneratePortalPair(const std::vector<Snake *> &allSnakes)
 {
     std::vector<Point> portalSite;
-    Point snakeHead = snake.getHeadPos();
     for (int i = 0; i < 2; i++)
     {
         Point p;
@@ -127,18 +147,28 @@ void MapManager::GeneratePortalPair(const Snake &snake)
             p.y = rng.generate(0, GRID_H - 1);
 
             // 判断是否和蛇身重叠
-            for (const auto &bodyPart : snake.getBody())
+            for (const auto *s : allSnakes)
             {
-                if (p == bodyPart)
+                for (const auto &sBody : s->getBody())
+                {
+                    if (p == sBody)
+                    {
+                        overlap = true;
+                        break;
+                    }
+                }
+                if (overlap)
+                    break;
+            }
+
+            for (const auto *s : allSnakes)
+            {
+                if (abs(p.x - s->getHeadPos().x) < DIS_MIN && abs(p.y - s->getHeadPos().y) < DIS_MIN)
                 {
                     overlap = true;
-                    break;
                 }
             }
-            if (abs(p.x - snakeHead.x) < DIS_MIN && abs(p.y - snakeHead.y) < DIS_MIN)
-            {
-                overlap = true;
-            }
+
             for (const auto &pair : warehouses)
             {
                 for (Item *item : pair.second)
@@ -178,29 +208,38 @@ void MapManager::GeneratePortalPair(const Snake &snake)
     portalSite.clear();
 }
 
-void MapManager::GenerateHalvePotion(const Snake &snake)
+void MapManager::GenerateHalvePotion(const std::vector<Snake *> &allSnakes)
 {
-    Point snakeHead = snake.getHeadPos();
     Point p;
-    while (true)
+    int attempts = 0;
+    while (attempts < 100)
     {
+        attempts++;
         bool overlap = false;
         p.x = rng.generate(0, GRID_W - 1);
         p.y = rng.generate(0, GRID_H - 1);
 
         // 判断是否和蛇身重叠
-        for (const auto &bodyPart : snake.getBody())
+        for (const auto *s : allSnakes)
         {
-            if (p == bodyPart)
+            for (const auto &sBody : s->getBody())
             {
-                overlap = true;
-                break;
+                if (p == sBody)
+                {
+                    overlap = true;
+                    break;
+                }
             }
+            if (overlap)
+                break;
         }
 
-        if (abs(p.x - snakeHead.x) < DIS_MIN && abs(p.y - snakeHead.y) < DIS_MIN)
+        for (const auto *s : allSnakes)
         {
-            overlap = true;
+            if (abs(p.x - s->getHeadPos().x) < DIS_MIN && abs(p.y - s->getHeadPos().y) < DIS_MIN)
+            {
+                overlap = true;
+            }
         }
 
         for (const auto &pair : warehouses)
@@ -233,6 +272,53 @@ void MapManager::drawAll() const
             item->draw();
         }
     }
+}
+
+Point MapManager::getFoodPos() const
+{
+    auto it = warehouses.find(ItemType::FOOD);
+    if (it != warehouses.end() && !it->second.empty())
+    {
+        return it->second[0]->getPos();
+    }
+    return Point(-1, -1);
+}
+
+void MapManager::addFood(Point p)
+{
+    warehouses[ItemType::FOOD].push_back(new Food(p));
+}
+
+int MapManager::getItemCount(ItemType type) const
+{
+    auto it = warehouses.find(type);
+    if (it != warehouses.end())
+    {
+        return static_cast<int>(it->second.size());
+    }
+    return 0;
+}
+
+Point MapManager::getNearestFoodPos(Point from) const
+{
+    auto it = warehouses.find(ItemType::FOOD);
+    if (it == warehouses.end() || it->second.empty())
+        return Point(-1, -1);
+
+    Point nearest(-1, -1);
+    int minDist = INT_MAX;
+
+    for (const auto *item : it->second)
+    {
+        Point p = item->getPos();
+        int dist = abs(p.x - from.x) + abs(p.y - from.y);
+        if (dist < minDist)
+        {
+            minDist = dist;
+            nearest = p;
+        }
+    }
+    return nearest;
 }
 
 Item *MapManager::getItemAt(Point p) const

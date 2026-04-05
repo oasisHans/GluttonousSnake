@@ -1,6 +1,7 @@
 #pragma once
 #include "Snake.h"
 #include "MapManager.h"
+#include "EnemySnake.h"
 
 // 定义碰撞结果枚举
 enum class CollisionResult
@@ -8,6 +9,7 @@ enum class CollisionResult
     NONE,
     WALL,
     SELF,
+    OTHERSNAKE,
     FOOD,
     OBSTACLE,
     PORTAL,
@@ -17,6 +19,11 @@ enum class CollisionResult
 
 class CollisionManager
 {
+
 public:
-    static CollisionResult check(Point nextPos, const Snake &snake, const MapManager &map);
+    static CollisionResult check(
+        Point nextPos,
+        const Snake &currentSnake,
+        const MapManager &map,
+        const std::vector<Snake *> &allSnakes);
 };

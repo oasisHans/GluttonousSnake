@@ -18,7 +18,7 @@ constexpr int GRID_W = (WIDTH / GRID_SIZE);
 constexpr int GRID_H = (HEIGHT / GRID_SIZE);
 
 // 帧率设置（速度设置）
-constexpr int DELAY_SLOW = 180;
+constexpr int DELAY_SLOW = 140;
 constexpr int DELAY_NORMAL = 90;
 constexpr int DELAY_FAST = 40;
 
@@ -65,6 +65,7 @@ enum class SetType
 {
     Speed,
     Obastacle,
+    IQ,
     Final
 };
 
@@ -82,6 +83,14 @@ enum class ObstacleLevel
     LOW,
     NORMAL,
     HIGH
+};
+
+// 敌人蛇智商
+enum class IQLevel
+{
+    LOW,    // 30
+    NORMAL, // 60
+    HIGH    // 85
 };
 
 // 基础坐标结构体

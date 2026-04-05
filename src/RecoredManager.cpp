@@ -24,13 +24,14 @@ void RecordManager::loadRecord()
         if (line.empty())
             continue;
         std::istringstream ss(line);
-        int score, speed, obstacle;
-        char comma1, comma2;
+        int score = 0, speed = 0, obstacle = 0, iq = 0; // 分开声明并初始化
+        char c1 = 0, c2 = 0, c3 = 0;
 
-        if (ss >> score >> comma1 >> speed >> comma2 >> obstacle &&
-            comma1 == ',' && comma2 == ',')
+        if (ss >> score >> c1 >> speed >> c2 >> obstacle >> c3 >> iq &&
+            c1 == ',' && c2 == ',' && c3 == ',')
         {
-            this->Allrecords.push_back({score, speed, obstacle});
+            std::vector<int> record = {score, speed, obstacle, iq}; // 显式构造
+            this->Allrecords.push_back(record);
         }
     }
     ifs.close();
@@ -48,14 +49,17 @@ void RecordManager::saveRecord(const GameSettings &settings, const int &score)
     ofs << score << ",";
     ofs << static_cast<int>(settings.getSpeedLevel()) << ",";
     ofs << static_cast<int>(settings.getObstacleLevel()) << ",";
+    ofs << static_cast<int>(settings.getIQLevel()) << ",";
     ofs << std::endl;
 
-    this->Allrecords.push_back({score,
-                                static_cast<int>(settings.getSpeedLevel()),
-                                static_cast<int>(settings.getObstacleLevel())});
-
-    ofs.close();
+    std::vector<int> record = {score, // 显式构造
+                               static_cast<int>(settings.getSpeedLevel()),
+                               static_cast<int>(settings.getObstacleLevel()),
+                               static_cast<int>(settings.getIQLevel())};
+    this->Allrecords.push_back(record);
+    this->sortRecord();
     this->ifFileEmpty = false;
+    ofs.close();
 }
 
 void RecordManager::sortRecord()
@@ -115,6 +119,21 @@ std::string RecordManager::obstacletoOBSTACLE(int obsnum) const
     }
 }
 
+std::string RecordManager::iqtoIQ(int iqnum) const
+{
+    switch (iqnum)
+    {
+    case 0:
+        return "LOW";
+    case 1:
+        return "NORMAL";
+    case 2:
+        return "HIGH";
+    default:
+        return "UNKNOWN";
+    }
+}
+
 void RecordManager::draw() const
 {
     int count = std::min(5, static_cast<int>(this->Allrecords.size()));
@@ -122,30 +141,39 @@ void RecordManager::draw() const
 
     settextcolor(YELLOW);
     settextstyle(30, 0, _T("Arial"));
-    outtextxy(WIDTH / 2 - 150, 30, "History Record");
-    line(50, 80, WIDTH - 50, 80);
+    outtextxy(WIDTH / 2 - 150, 20, _T("History Record"));
+    line(30, 60, WIDTH - 30, 60);
 
-    settextstyle(20, 0, _T("Arial"));
-    outtextxy(50, 100, "Record:");
-    outtextxy(200, 100, "Speed Level:");
-    outtextxy(350, 100, "Obstacle Level:");
-    line(50, 120, 500, 120);
+    settextstyle(18, 0, _T("Consolas"));
+    settextcolor(WHITE);
+    outtextxy(30, 80, _T("Score"));
+    outtextxy(150, 80, _T("Speed"));
+    outtextxy(270, 80, _T("Obstacle"));
+    outtextxy(420, 80, _T("Enemy IQ"));
+    line(30, 102, WIDTH - 30, 102);
 
-    int y = 150;
+    int y = 115;
     for (int i = 0; i < count; i++)
     {
-        std::string record = std::to_string(this->Allrecords[i][0]);
+        if (i == 0)
+            settextcolor(YELLOW);
+        else
+            settextcolor(WHITE);
+
+        settextstyle(18, 0, _T("Consolas"));
+
+        std::string score = std::to_string(this->Allrecords[i][0]);
         std::string speed = speedtoSPEED(this->Allrecords[i][1]);
         std::string obstacle = obstacletoOBSTACLE(this->Allrecords[i][2]);
+        std::string iq = iqtoIQ(this->Allrecords[i][3]);
 
-        // 显示记录数据
-        outtextxy(50, y, record.c_str());
-        outtextxy(200, y, speed.c_str());
-        outtextxy(350, y, obstacle.c_str());
+        outtextxy(30, y, score.c_str());
+        outtextxy(150, y, speed.c_str());
+        outtextxy(270, y, obstacle.c_str());
+        outtextxy(420, y, iq.c_str());
 
-        line(50, y + 20, 500, y + 20);
-
-        y += 30;
+        line(30, y + 22, WIDTH - 30, y + 22);
+        y += 35;
     }
 
     // 没有记录

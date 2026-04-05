@@ -10,12 +10,15 @@
 #include "Render.h"
 #include "GameSettings.h"
 #include "RecordManager.h"
+#include "EnemySnake.h"
 
 class GameManager
 {
 private:
     PlayerSnake *snake;
     MapManager *map;
+    std::vector<EnemySnake *> enemies;
+
     InputHandler input;
     GameState gamestate;
     Render renderer;
@@ -24,6 +27,7 @@ private:
 
     int score;
     RandomGenerator rng;
+    int lastGoatBeforeGame;
 
 public:
     GameManager();

@@ -1,6 +1,9 @@
 #include "CollisionManager.h"
 
-CollisionResult CollisionManager::check(Point nextPos, const Snake &snake, const MapManager &map)
+CollisionResult CollisionManager::check(Point nextPos,
+                                        const Snake &currentSnake,
+                                        const MapManager &map,
+                                        const std::vector<Snake *> &allSnakes)
 {
     // 1.撞墙情况
     if (nextPos.x < 0 || nextPos.y < 0 || nextPos.x >= GRID_W || nextPos.y >= GRID_H)
@@ -8,13 +11,19 @@ CollisionResult CollisionManager::check(Point nextPos, const Snake &snake, const
         return CollisionResult::WALL;
     }
 
-    // 2.撞自己
-    const auto &body = snake.getBody();
-    for (size_t i = 1; i < body.size(); ++i)
+    // 2.撞蛇
+    for (const auto *s : allSnakes)
     {
-        if (nextPos == body[i])
+        const auto &body = s->getBody();
+
+        size_t startIdx = (s == &currentSnake) ? 1 : 0;
+
+        for (size_t i = startIdx; i < body.size(); ++i)
         {
-            return CollisionResult::SELF;
+            if (nextPos == body[i])
+            {
+                return (s == &currentSnake) ? CollisionResult::SELF : CollisionResult::OTHERSNAKE;
+            }
         }
     }
 

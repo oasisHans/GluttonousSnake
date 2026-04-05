@@ -38,19 +38,39 @@ void GameManager::initGame()
         map = nullptr;
     }
 
+    for (auto e : enemies)
+        delete e;
+    enemies.clear();
+
     // 初始化分数
     this->score = 0;
+    // 初始化最高分
+    this->lastGoatBeforeGame = this->record.getLastGoat();
     // 创建地图
     this->map = new MapManager();
     // 创建Snake
     this->snake = new PlayerSnake(Point(GRID_W / 2, GRID_H / 2), Direction::RIGHT, GREEN);
 
-    this->map->GenerateFood(*(this->snake));
-    this->map->GenerateObstacle(*(this->snake), this->gamesettings.getObstacleLevel());
+    std::vector<Snake *> tempNames;
+    tempNames.push_back(this->snake);
+    this->map->GenerateFood(tempNames);
+    this->map->GenerateObstacle(tempNames, this->gamesettings.getObstacleLevel());
 }
 
 void GameManager::updatePlaying()
 {
+
+    std::vector<Snake *> allSnakes;
+    if (snake)
+    {
+        allSnakes.push_back(snake);
+    }
+
+    for (auto e : enemies)
+    {
+        allSnakes.push_back(e);
+    }
+
     if (input.isKeyPressed(VK_SPACE))
     {
         gamestate = GameState::Paused;
@@ -58,13 +78,12 @@ void GameManager::updatePlaying()
     }
 
     snake->HandleInput(input);
-
     Point finalPos = snake->getNextHead();
     bool resolved = false;
 
     while (!resolved)
     {
-        CollisionResult res = CollisionManager::check(finalPos, *snake, *map);
+        CollisionResult res = CollisionManager::check(finalPos, *snake, *map, allSnakes);
 
         switch (res)
         {
@@ -83,7 +102,7 @@ void GameManager::updatePlaying()
         }
     }
 
-    CollisionResult finalRes = CollisionManager::check(finalPos, *snake, *map);
+    CollisionResult finalRes = CollisionManager::check(finalPos, *snake, *map, allSnakes);
 
     switch (finalRes)
     {
@@ -92,27 +111,46 @@ void GameManager::updatePlaying()
         break;
 
     case CollisionResult::FOOD:
+    {
         snake->moveDirect(finalPos, true, false);
         this->score++;
 
         // 清空旧地图
-        map->removeTypeAll(ItemType::FOOD);
-        map->removeTypeAll(ItemType::OBSTACLE);
+        Item *targetFood = map->getItemAt(finalPos);
+        map->removeItem(targetFood);
+
         map->removeTypeAll(ItemType::PORTAL);
         map->removeTypeAll(ItemType::HALVEPOTION);
+
+        if (score >= 5 && (enemies.size() < 1))
+        {
+            enemies.push_back(new EnemySnake(Point(1, 1), Direction::RIGHT, YELLOW));
+        }
+        if (score >= 15 && (enemies.size() < 2))
+        {
+            enemies.push_back(new EnemySnake(Point(1, 1), Direction::RIGHT, YELLOW));
+        }
+        allSnakes.clear();
+        allSnakes.push_back(this->snake);
+        for (auto e : enemies)
+            allSnakes.push_back(e);
+
         // 生成下一轮地图
-        map->GenerateFood(*snake);
-        map->GenerateObstacle(*snake, gamesettings.getObstacleLevel());
+        if (map->getItemCount(ItemType::FOOD) < 2)
+        {
+            map->GenerateFood(allSnakes);
+        }
+
         if (this->rng.chance(PortalChance))
         {
-            map->GeneratePortalPair(*snake);
+            map->GeneratePortalPair(allSnakes);
         }
         if (this->rng.chance(HalveChance))
         {
-            map->GenerateHalvePotion(*snake);
+            map->GenerateHalvePotion(allSnakes);
         }
         break;
-
+    }
     case CollisionResult::HALVEPOTION:
         snake->moveDirect(finalPos, false, true);
         map->removeTypeAll(ItemType::HALVEPOTION);
@@ -120,15 +158,90 @@ void GameManager::updatePlaying()
 
     case CollisionResult::SELF:
     case CollisionResult::OBSTACLE:
+    case CollisionResult::OTHERSNAKE:
+        record.last_Goat = record.getLastGoat();
         snake->die();
-        renderer.render(gamestate, snake, map, score, gamesettings, record);
+        renderer.render(gamestate, snake, map, score, gamesettings, record, enemies);
         FlushBatchDraw();
         Sleep(1000);
         this->gamestate = GameState::GameOver;
         break;
     }
-}
+    allSnakes.clear();
+    allSnakes.push_back(snake);
+    for (auto e : enemies)
+        allSnakes.push_back(e);
 
+    // enemy蛇逻辑
+    for (auto it = enemies.begin(); it != enemies.end();)
+    {
+        EnemySnake *e = *it;
+        e->AI_handle(*map, *snake, allSnakes, gamesettings.getIQValue());
+        Point ePos = e->getNextHead();
+        bool eResolved = false;
+
+        while (!eResolved)
+        {
+            CollisionResult res = CollisionManager::check(ePos, *e, *map, allSnakes);
+
+            switch (res)
+            {
+            case CollisionResult::WALL:
+                ePos = e->getWrappedPos(ePos);
+                break;
+            case CollisionResult::PORTAL:
+            {
+                Portal *p = static_cast<Portal *>(map->getItemAt(ePos));
+                ePos = p->getDestination();
+                map->removeTypeAll(ItemType::PORTAL);
+                break;
+            }
+            default:
+                eResolved = true;
+                break;
+            }
+        }
+
+        CollisionResult eFinal = CollisionManager::check(ePos, *e, *map, allSnakes);
+        switch (eFinal)
+        {
+        case CollisionResult::NONE:
+            e->moveDirect(ePos, false, false);
+            ++it;
+            break;
+        case CollisionResult::FOOD:
+        {
+            e->moveDirect(ePos, true, false);
+            Item *targetFood = map->getItemAt(ePos);
+            map->removeItem(targetFood);
+            if (map->getItemCount(ItemType::FOOD) < 2)
+            {
+                map->GenerateFood(allSnakes);
+            }
+            ++it;
+            break;
+        }
+        case CollisionResult::HALVEPOTION:
+            e->moveDirect(ePos, false, true);
+            map->removeTypeAll(ItemType::HALVEPOTION);
+            ++it;
+            break;
+        case CollisionResult::OBSTACLE:
+        case CollisionResult::OTHERSNAKE:
+        case CollisionResult::SELF:
+            for (const auto &bodyPart : e->getBody())
+            {
+                if (map->getItemAt(bodyPart) == nullptr)
+                {
+                    map->addFood(bodyPart);
+                }
+            }
+            e->die();
+            it = enemies.erase(it);
+            break;
+        }
+    }
+}
 // 游戏运行总逻辑
 void GameManager::run()
 {
@@ -208,7 +321,7 @@ void GameManager::run()
         }
         }
 
-        renderer.render(gamestate, snake, map, score, gamesettings, record);
+        renderer.render(gamestate, snake, map, score, gamesettings, record, enemies);
 
         if (gamestate == GameState::Playing)
         {

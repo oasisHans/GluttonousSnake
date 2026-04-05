@@ -1,6 +1,7 @@
 #include "Render.h"
 
-void Render::render(GameState gamestate, const Snake *snake, const MapManager *map, int score, const GameSettings &settings, const RecordManager &record)
+void Render::render(GameState gamestate, const Snake *snake, const MapManager *map, int score, const GameSettings &settings,
+                    const RecordManager &record, const std::vector<EnemySnake *> &enemies)
 {
     BeginBatchDraw();
     cleardevice();
@@ -17,7 +18,7 @@ void Render::render(GameState gamestate, const Snake *snake, const MapManager *m
         this->drawHistoryUI(record);
         break;
     case GameState::Playing:
-        this->drawPlayingUI(snake, map, score);
+        this->drawPlayingUI(snake, map, score, enemies);
         break;
     case GameState::Paused:
         this->drawPauseUI();
@@ -75,6 +76,19 @@ void Render::drawSetUI(const GameSettings &settings)
         settextcolor(LIGHTGRAY);
         outtextxy(WIDTH / 4, HEIGHT / 2 + 100, _T("Press 1, 2 or 3 to Set Obastale"));
         break;
+    case SetType::IQ:
+        settextcolor(WHITE);
+        settextstyle(25, 0, _T("Consolas"));
+        outtextxy(WIDTH / 8, HEIGHT / 6, _T("Select Enemy IQ:"));
+
+        settextcolor(YELLOW);
+        outtextxy(WIDTH / 4, HEIGHT / 2 - 40, _T("1. LOW    (Easy)"));
+        outtextxy(WIDTH / 4, HEIGHT / 2, _T("2. NORMAL (Medium)"));
+        outtextxy(WIDTH / 4, HEIGHT / 2 + 40, _T("3. HIGH   (Hard)"));
+
+        settextcolor(LIGHTGRAY);
+        outtextxy(WIDTH / 4, HEIGHT / 2 + 100, _T("Press 1, 2 or 3 to Set IQ"));
+        break;
     }
 }
 
@@ -83,10 +97,14 @@ void Render::drawHistoryUI(const RecordManager &record)
     record.draw();
 }
 
-void Render::drawPlayingUI(const Snake *snake, const MapManager *map, int score)
+void Render::drawPlayingUI(const Snake *snake, const MapManager *map, int score, const std::vector<EnemySnake *> &enemies)
 {
     map->drawAll();
     snake->draw();
+    for (auto e : enemies)
+    {
+        e->draw();
+    }
 
     // 绘制实时分数
     settextcolor(YELLOW);

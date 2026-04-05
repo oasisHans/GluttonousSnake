@@ -25,4 +25,5 @@ public:
     int getLastGoat() const;
     std::string speedtoSPEED(int speednum) const;
     std::string obstacletoOBSTACLE(int obsnum) const;
+    std::string iqtoIQ(int iqnum) const;
 };

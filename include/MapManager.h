@@ -21,13 +21,18 @@ public:
     MapManager();
     ~MapManager();
 
-    void GenerateFood(const Snake &snake);
-    void GenerateObstacle(const Snake &snake, const ObstacleLevel &num_obs);
-    void GeneratePortalPair(const Snake &snake);
-    void GenerateHalvePotion(const Snake &snake);
+    void GenerateFood(const std::vector<Snake *> &allSnakes);
+    void GenerateObstacle(const std::vector<Snake *> &allSnakes, const ObstacleLevel &num_obs);
+    void GeneratePortalPair(const std::vector<Snake *> &allSnakes);
+    void GenerateHalvePotion(const std::vector<Snake *> &allSnakes);
 
     void drawAll() const;
 
+    Point getFoodPos() const;
+    void addFood(Point p);
+
+    Point getNearestFoodPos(Point from) const;
+    int getItemCount(ItemType type) const;
     Item *getItemAt(Point p) const;
     void removeItem(Item *item);
     void removeTypeAll(ItemType itemtype);
