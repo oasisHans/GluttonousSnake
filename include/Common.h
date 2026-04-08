@@ -85,6 +85,7 @@ enum class Speed
 // 设置障碍物数量枚举
 enum class ObstacleLevel
 {
+    NONE,
     LOW,
     NORMAL,
     HIGH

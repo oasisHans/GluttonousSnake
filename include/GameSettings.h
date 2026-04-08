@@ -23,4 +23,5 @@ public:
     Speed getSpeedLevel() const { return speedLevel; }
     IQLevel getIQLevel() const { return iqLevel; }
     int getIQValue() const;
+    bool ifgenerateEnemy;
 };

@@ -121,20 +121,23 @@ void GameManager::updatePlaying()
         map->removeTypeAll(ItemType::PORTAL);
         map->removeTypeAll(ItemType::HALVEPOTION);
 
-        if (score >= 5 && (enemies.size() < 1))
+        if (gamesettings.ifgenerateEnemy)
         {
-            Point spawnPos = randomSpawnPoint(allSnakes);
-            enemies.push_back(new EnemySnake(spawnPos, Direction::RIGHT, YELLOW));
-        }
-        if (score >= 15 && (enemies.size() < 2))
-        {
-            Point spawnPos = randomSpawnPoint(allSnakes);
-            enemies.push_back(new EnemySnake(spawnPos, Direction::RIGHT, YELLOW));
-        }
-        if (score >= 25 && (enemies.size() < 3))
-        {
-            Point spawnPos = randomSpawnPoint(allSnakes);
-            enemies.push_back(new EnemySnake(spawnPos, Direction::RIGHT, YELLOW));
+            if (score >= 5 && (enemies.size() < 1))
+            {
+                Point spawnPos = randomSpawnPoint(allSnakes);
+                enemies.push_back(new EnemySnake(spawnPos, Direction::RIGHT, YELLOW));
+            }
+            if (score >= 15 && (enemies.size() < 2))
+            {
+                Point spawnPos = randomSpawnPoint(allSnakes);
+                enemies.push_back(new EnemySnake(spawnPos, Direction::RIGHT, YELLOW));
+            }
+            if (score >= 25 && (enemies.size() < 3))
+            {
+                Point spawnPos = randomSpawnPoint(allSnakes);
+                enemies.push_back(new EnemySnake(spawnPos, Direction::RIGHT, YELLOW));
+            }
         }
 
         allSnakes.clear();
@@ -354,6 +357,8 @@ void GameManager::run()
         case GameState::Paused:
             if (input.isKeyPressed(VK_SPACE))
                 gamestate = GameState::Playing;
+            if (input.isKeyPressed(0x30) || input.isKeyPressed(0x60))
+                gamestate = GameState::GameOver;
             break;
         case GameState::GameOver:
         {

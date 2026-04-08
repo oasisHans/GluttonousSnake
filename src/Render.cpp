@@ -69,6 +69,7 @@ void Render::drawSetUI(const GameSettings &settings)
         outtextxy(WIDTH / 8, HEIGHT / 6, _T("Select num of Obstacles:"));
 
         settextcolor(YELLOW);
+        outtextxy(WIDTH / 4, HEIGHT / 2 - 80, _T("0. NONE"));
         outtextxy(WIDTH / 4, HEIGHT / 2 - 40, _T("1. LOW"));
         outtextxy(WIDTH / 4, HEIGHT / 2, _T("2. NORMAL"));
         outtextxy(WIDTH / 4, HEIGHT / 2 + 40, _T("3. HIGHT"));
@@ -82,6 +83,7 @@ void Render::drawSetUI(const GameSettings &settings)
         outtextxy(WIDTH / 8, HEIGHT / 6, _T("Select Enemy IQ:"));
 
         settextcolor(YELLOW);
+        outtextxy(WIDTH / 4, HEIGHT / 2 - 80, _T("0. NONE"));
         outtextxy(WIDTH / 4, HEIGHT / 2 - 40, _T("1. LOW"));
         outtextxy(WIDTH / 4, HEIGHT / 2, _T("2. NORMAL"));
         outtextxy(WIDTH / 4, HEIGHT / 2 + 40, _T("3. HIGH"));
@@ -119,6 +121,7 @@ void Render::drawPauseUI()
     settextcolor(WHITE);
     settextstyle(25, 0, _T("Consolas"));
     outtextxy(WIDTH / 4, HEIGHT / 2, _T("Press SPACE to continue"));
+    outtextxy(WIDTH / 4, HEIGHT / 2 + 40, _T("Press 0 to exit"));
 }
 void Render::drawGameOverUI(int score, const RecordManager &record)
 {

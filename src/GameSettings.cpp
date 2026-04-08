@@ -41,6 +41,10 @@ void GameSettings::setGame(int choice)
     case SetType::Obastacle:
         switch (choice)
         {
+        case 0:
+            obsLevel = ObstacleLevel::NONE;
+            setStep = SetType::IQ;
+            break;
         case 1:
             obsLevel = ObstacleLevel::LOW;
             setStep = SetType::IQ;
@@ -61,15 +65,22 @@ void GameSettings::setGame(int choice)
     case SetType::IQ:
         switch (choice)
         {
+        case 0:
+            ifgenerateEnemy = false;
+            setStep = SetType::Final;
+            break;
         case 1:
+            ifgenerateEnemy = true;
             iqLevel = IQLevel::LOW;
             setStep = SetType::Final;
             break;
         case 2:
+            ifgenerateEnemy = true;
             iqLevel = IQLevel::NORMAL;
             setStep = SetType::Final;
             break;
         case 3:
+            ifgenerateEnemy = true;
             iqLevel = IQLevel::HIGH;
             setStep = SetType::Final;
             break;

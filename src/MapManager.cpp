@@ -64,6 +64,9 @@ void MapManager::GenerateObstacle(const std::vector<Snake *> &allSnakes, const O
     int num = 0;
     switch (obsLevel)
     {
+    case ObstacleLevel::NONE:
+        num = 0;
+        break;
     case ObstacleLevel::LOW:
         num = rng.generate(4, 6);
         break;
