@@ -15,14 +15,19 @@ CollisionResult CollisionManager::check(Point nextPos,
     for (const auto *s : allSnakes)
     {
         const auto &body = s->getBody();
-
         size_t startIdx = (s == &currentSnake) ? 1 : 0;
-
         for (size_t i = startIdx; i < body.size(); ++i)
         {
             if (nextPos == body[i])
             {
-                return (s == &currentSnake) ? CollisionResult::SELF : CollisionResult::OTHERSNAKE;
+                if (s == &currentSnake)
+                    return CollisionResult::SELF;
+
+                // 碰到其他蛇：区分头部(i==0)和身体
+                if (i == 0)
+                    return CollisionResult::OTHERSNAKE_HEAD;
+                else
+                    return CollisionResult::OTHERSNAKE;
             }
         }
     }

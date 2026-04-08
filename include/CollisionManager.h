@@ -10,6 +10,7 @@ enum class CollisionResult
     WALL,
     SELF,
     OTHERSNAKE,
+    OTHERSNAKE_HEAD,
     FOOD,
     OBSTACLE,
     PORTAL,

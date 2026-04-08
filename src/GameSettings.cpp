@@ -85,13 +85,13 @@ int GameSettings::getIQValue() const
     switch (iqLevel)
     {
     case IQLevel::LOW:
-        return 30;
+        return IQValue_LOW;
     case IQLevel::NORMAL:
-        return 60;
+        return IQValue_NORMAL;
     case IQLevel::HIGH:
-        return 85;
+        return IQValue_HIGH;
     default:
-        return 60;
+        return IQValue_NORMAL;
     }
 }
 

@@ -38,4 +38,7 @@ public:
     // 内部逻辑分块
     void initGame();      // 初始化/重置游戏
     void updatePlaying(); // 处理游戏运行逻辑
+
+    // 随机生成点
+    Point randomSpawnPoint(const std::vector<Snake *> &allSnakes);
 };

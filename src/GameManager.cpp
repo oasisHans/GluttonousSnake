@@ -59,7 +59,6 @@ void GameManager::initGame()
 
 void GameManager::updatePlaying()
 {
-
     std::vector<Snake *> allSnakes;
     if (snake)
     {
@@ -124,12 +123,20 @@ void GameManager::updatePlaying()
 
         if (score >= 5 && (enemies.size() < 1))
         {
-            enemies.push_back(new EnemySnake(Point(1, 1), Direction::RIGHT, YELLOW));
+            Point spawnPos = randomSpawnPoint(allSnakes);
+            enemies.push_back(new EnemySnake(spawnPos, Direction::RIGHT, YELLOW));
         }
         if (score >= 15 && (enemies.size() < 2))
         {
-            enemies.push_back(new EnemySnake(Point(1, 1), Direction::RIGHT, YELLOW));
+            Point spawnPos = randomSpawnPoint(allSnakes);
+            enemies.push_back(new EnemySnake(spawnPos, Direction::RIGHT, YELLOW));
         }
+        if (score >= 25 && (enemies.size() < 3))
+        {
+            Point spawnPos = randomSpawnPoint(allSnakes);
+            enemies.push_back(new EnemySnake(spawnPos, Direction::RIGHT, YELLOW));
+        }
+
         allSnakes.clear();
         allSnakes.push_back(this->snake);
         for (auto e : enemies)
@@ -140,7 +147,6 @@ void GameManager::updatePlaying()
         {
             map->GenerateFood(allSnakes);
         }
-
         if (this->rng.chance(PortalChance))
         {
             map->GeneratePortalPair(allSnakes);
@@ -149,13 +155,51 @@ void GameManager::updatePlaying()
         {
             map->GenerateHalvePotion(allSnakes);
         }
+
+        // 强制保证有食物
+        if (map->getItemCount(ItemType::FOOD) == 0)
+        {
+            map->GenerateFood(allSnakes);
+        }
+
         break;
     }
     case CollisionResult::HALVEPOTION:
         snake->moveDirect(finalPos, false, true);
         map->removeTypeAll(ItemType::HALVEPOTION);
         break;
+    case CollisionResult::OTHERSNAKE_HEAD:
+    {
+        // 找到是哪条enemy的头和玩家头碰了
+        for (auto it = enemies.begin(); it != enemies.end();)
+        {
+            EnemySnake *e = *it;
+            if (e->getHeadPos() == finalPos)
+            {
+                int count = 0;
+                for (const auto &bodyPart : e->getBody())
+                {
+                    if (count % 2 == 0)
+                    {
+                        if (map->getItemAt(bodyPart) == nullptr)
+                        {
+                            map->addFood(bodyPart);
+                        }
+                    }
+                    count++;
+                }
 
+                e->die();
+                it = enemies.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+        snake->moveDirect(finalPos, false, false); // 玩家正常移动
+        break;
+    }
     case CollisionResult::SELF:
     case CollisionResult::OBSTACLE:
     case CollisionResult::OTHERSNAKE:
@@ -219,6 +263,10 @@ void GameManager::updatePlaying()
                 map->GenerateFood(allSnakes);
             }
             ++it;
+            if (map->getItemCount(ItemType::FOOD) == 0)
+            {
+                map->GenerateFood(allSnakes);
+            }
             break;
         }
         case CollisionResult::HALVEPOTION:
@@ -228,18 +276,30 @@ void GameManager::updatePlaying()
             break;
         case CollisionResult::OBSTACLE:
         case CollisionResult::OTHERSNAKE:
+        case CollisionResult::OTHERSNAKE_HEAD:
         case CollisionResult::SELF:
+            int count = 0;
             for (const auto &bodyPart : e->getBody())
             {
-                if (map->getItemAt(bodyPart) == nullptr)
+
+                if (count % 2 == 0)
                 {
-                    map->addFood(bodyPart);
+                    if (map->getItemAt(bodyPart) == nullptr)
+                    {
+                        map->addFood(bodyPart);
+                    }
                 }
+                count++;
             }
             e->die();
             it = enemies.erase(it);
             break;
         }
+    }
+
+    if (map->getItemCount(ItemType::FOOD) == 0)
+    {
+        map->GenerateFood(allSnakes);
     }
 }
 // 游戏运行总逻辑
@@ -332,4 +392,59 @@ void GameManager::run()
             Sleep(20);
         }
     }
+}
+
+Point GameManager::randomSpawnPoint(const std::vector<Snake *> &allSnakes)
+{
+    Point p;
+    int attempts = 0;
+    while (attempts < 1000)
+    {
+        attempts++;
+        p.x = rng.generate(0, GRID_W - 1);
+        p.y = rng.generate(0, GRID_H - 1);
+
+        bool overlap = false;
+
+        // 不能与任何蛇重叠
+        for (const auto *s : allSnakes)
+        {
+            for (const auto &body : s->getBody())
+            {
+                if (p == body)
+                {
+                    overlap = true;
+                    break;
+                }
+            }
+            if (overlap)
+                break;
+        }
+        if (overlap)
+            continue;
+
+        // 不与任何蛇头过近
+        bool close = false;
+        for (const auto *s : allSnakes)
+        {
+            Point headPos = s->getHeadPos();
+            int dis = 0;
+            dis = abs(p.x - headPos.x) + abs(p.y - headPos.y);
+            if (dis < 5)
+            {
+                close = true;
+                break;
+            }
+        }
+
+        if (close)
+            continue;
+
+        if (map->getItemAt(p) != nullptr)
+            continue;
+
+        // 条件均满足，跳出while循环
+        break;
+    }
+    return p;
 }

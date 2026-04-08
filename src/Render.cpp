@@ -82,9 +82,9 @@ void Render::drawSetUI(const GameSettings &settings)
         outtextxy(WIDTH / 8, HEIGHT / 6, _T("Select Enemy IQ:"));
 
         settextcolor(YELLOW);
-        outtextxy(WIDTH / 4, HEIGHT / 2 - 40, _T("1. LOW    (Easy)"));
-        outtextxy(WIDTH / 4, HEIGHT / 2, _T("2. NORMAL (Medium)"));
-        outtextxy(WIDTH / 4, HEIGHT / 2 + 40, _T("3. HIGH   (Hard)"));
+        outtextxy(WIDTH / 4, HEIGHT / 2 - 40, _T("1. LOW"));
+        outtextxy(WIDTH / 4, HEIGHT / 2, _T("2. NORMAL"));
+        outtextxy(WIDTH / 4, HEIGHT / 2 + 40, _T("3. HIGH"));
 
         settextcolor(LIGHTGRAY);
         outtextxy(WIDTH / 4, HEIGHT / 2 + 100, _T("Press 1, 2 or 3 to Set IQ"));

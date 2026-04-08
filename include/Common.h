@@ -30,6 +30,11 @@ constexpr int PortalChance = 50;
 // 减半药水生成概率（%）
 constexpr int HalveChance = 30;
 
+// 蛇具体智商
+constexpr int IQValue_LOW = 30;
+constexpr int IQValue_NORMAL = 60;
+constexpr int IQValue_HIGH = 85;
+
 // Snake方向枚举
 enum class Direction
 {

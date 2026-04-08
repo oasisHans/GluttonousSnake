@@ -193,32 +193,41 @@ Direction EnemySnake::findPath(Point Target, const MapManager &map, const std::v
 
 bool EnemySnake::isCellSafe(Point p, const MapManager &map, const std::vector<Snake *> &allSnakes, const Snake &player)
 {
-    if (p.x < 0 || p.x >= GRID_W || p.y < 0 || p.y >= GRID_H)
-    {
-        return false;
-    }
-    // 检查是否撞到障碍物
-    Item *item = map.getItemAt(p);
-    if (item != nullptr)
-    {
-        if (item->getType() == ItemType::OBSTACLE)
-        {
-            return false;
-        }
-    }
 
-    // 检查是否撞到蛇身
+    if (p.x < 0 || p.x >= GRID_W || p.y < 0 || p.y >= GRID_H)
+        return false;
+
+    Item *item = map.getItemAt(p);
+    if (item != nullptr && item->getType() == ItemType::OBSTACLE)
+        return false;
+
+    // 检查自身和其他enemy蛇身，跳过玩家蛇
     for (const auto *s : allSnakes)
     {
-        if (s != this)
+        if (s == &player)
             continue;
         const auto &sBody = s->getBody();
-        size_t startIdx = 1;
+        size_t startIdx = (s == this) ? 1 : 0;
         for (size_t i = startIdx; i < sBody.size(); ++i)
-        {
             if (p == sBody[i])
+                return false;
+    }
+
+    // 玩家蛇头附近2格视为危险
+    Point playerHead = player.getHeadPos();
+    if (abs(p.x - playerHead.x) + abs(p.y - playerHead.y) <= 2)
+        return false;
+
+    // 玩家蛇身间隔采样，每6格看见3格
+    const auto &playerBody = player.getBody();
+    for (size_t i = 0; i < playerBody.size(); ++i)
+    {
+        if (i % 6 < 3)
+        {
+            if (p == playerBody[i])
                 return false;
         }
     }
+
     return true;
 }

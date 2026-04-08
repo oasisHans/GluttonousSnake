@@ -68,10 +68,10 @@ void MapManager::GenerateObstacle(const std::vector<Snake *> &allSnakes, const O
         num = rng.generate(4, 6);
         break;
     case ObstacleLevel::NORMAL:
-        num = rng.generate(10, 12);
+        num = rng.generate(8, 10);
         break;
     case ObstacleLevel::HIGH:
-        num = rng.generate(20, 25);
+        num = rng.generate(18, 24);
         break;
     }
     for (int i = 0; i < num; i++)
