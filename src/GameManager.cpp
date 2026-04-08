@@ -146,10 +146,13 @@ void GameManager::updatePlaying()
             allSnakes.push_back(e);
 
         // 生成下一轮地图
-        if (map->getItemCount(ItemType::FOOD) < 2)
+
+        // 强制保证有食物
+        if (map->getItemCount(ItemType::FOOD) == 0)
         {
             map->GenerateFood(allSnakes);
         }
+
         if (this->rng.chance(PortalChance))
         {
             map->GeneratePortalPair(allSnakes);
@@ -157,12 +160,6 @@ void GameManager::updatePlaying()
         if (this->rng.chance(HalveChance))
         {
             map->GenerateHalvePotion(allSnakes);
-        }
-
-        // 强制保证有食物
-        if (map->getItemCount(ItemType::FOOD) == 0)
-        {
-            map->GenerateFood(allSnakes);
         }
 
         break;
@@ -261,15 +258,12 @@ void GameManager::updatePlaying()
             e->moveDirect(ePos, true, false);
             Item *targetFood = map->getItemAt(ePos);
             map->removeItem(targetFood);
-            if (map->getItemCount(ItemType::FOOD) < 2)
-            {
-                map->GenerateFood(allSnakes);
-            }
-            ++it;
+
             if (map->getItemCount(ItemType::FOOD) == 0)
             {
                 map->GenerateFood(allSnakes);
             }
+            ++it;
             break;
         }
         case CollisionResult::HALVEPOTION:
@@ -299,6 +293,11 @@ void GameManager::updatePlaying()
             break;
         }
     }
+
+    allSnakes.clear();
+    allSnakes.push_back(snake);
+    for (auto e : enemies)
+        allSnakes.push_back(e);
 
     if (map->getItemCount(ItemType::FOOD) == 0)
     {

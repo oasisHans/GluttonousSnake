@@ -43,7 +43,7 @@ void EnemySnake::AI_handle(const MapManager &map, const Snake &player, const std
     Point Target;
     if (this->body.size() < (((player.getBody().size()) * 2) / 3))
     {
-        Target = map.getNearestFoodPos(this->getHeadPos());
+        Target = map.getNearestFoodPos(this->getNextHead());
         if (Target.x == -1)
             return;
     }
@@ -213,9 +213,9 @@ bool EnemySnake::isCellSafe(Point p, const MapManager &map, const std::vector<Sn
                 return false;
     }
 
-    // 玩家蛇头附近2格视为危险
+    // 玩家蛇头附近视为危险
     Point playerHead = player.getHeadPos();
-    if (abs(p.x - playerHead.x) + abs(p.y - playerHead.y) <= 2)
+    if (abs(p.x - playerHead.x) + abs(p.y - playerHead.y) <= 1)
         return false;
 
     // 玩家蛇身间隔采样，每6格看见3格

@@ -33,7 +33,7 @@ constexpr int HalveChance = 30;
 // 蛇具体智商
 constexpr int IQValue_LOW = 30;
 constexpr int IQValue_NORMAL = 60;
-constexpr int IQValue_HIGH = 85;
+constexpr int IQValue_HIGH = 95;
 
 // Snake方向枚举
 enum class Direction
@@ -94,9 +94,9 @@ enum class ObstacleLevel
 // 敌人蛇智商
 enum class IQLevel
 {
-    LOW,    // 30
-    NORMAL, // 60
-    HIGH    // 85
+    LOW,
+    NORMAL,
+    HIGH
 };
 
 // 基础坐标结构体
